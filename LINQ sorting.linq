@@ -1,20 +1,16 @@
 <Query Kind="Expression">
   <Connection>
-    <ID>54bf9502-9daf-4093-88e8-7177c12aaaaa</ID>
-    <NamingService>2</NamingService>
+    <ID>b9ded474-0ce3-4d70-b357-147d523bbb61</ID>
+    <NamingServiceVersion>2</NamingServiceVersion>
     <Persist>true</Persist>
-    <Driver Assembly="(internal)" PublicKeyToken="no-strong-name">LINQPad.Drivers.EFCore.DynamicDriver</Driver>
-    <AttachFileName>&lt;ApplicationData&gt;\LINQPad\ChinookDemoDb.sqlite</AttachFileName>
-    <DisplayName>Demo database (SQLite)</DisplayName>
-    <DriverData>
-      <PreserveNumeric1>true</PreserveNumeric1>
-      <EFProvider>Microsoft.EntityFrameworkCore.Sqlite</EFProvider>
-      <MapSQLiteDateTimes>true</MapSQLiteDateTimes>
-      <MapSQLiteBooleans>true</MapSQLiteBooleans>
-    </DriverData>
+    <Server>WB320-02\SQLEXPRESS</Server>
+    <AllowDateOnlyTimeOnly>true</AllowDateOnlyTimeOnly>
+    <DeferDatabasePopulation>true</DeferDatabasePopulation>
+    <Database>Chinook</Database>
   </Connection>
 </Query>
 
+// https://dmit-2018.github.io/demos/eRestaurant/linq/LinqPad/expressions.html
 // Sorting
 // There is a significant difference between query syntax and method syntax
 
