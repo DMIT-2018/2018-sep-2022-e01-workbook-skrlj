@@ -1,9 +1,9 @@
 <Query Kind="Statements">
   <Connection>
-    <ID>5b9a15b4-8b4b-4383-a70b-732c1939e0c1</ID>
+    <ID>a46606c5-cab2-4dc3-8c12-94ec1d3b2254</ID>
     <NamingServiceVersion>2</NamingServiceVersion>
     <Persist>true</Persist>
-    <Server>WC320-06\SQLEXPRESS</Server>
+    <Server>.\SQLEXPRESS</Server>
     <AllowDateOnlyTimeOnly>true</AllowDateOnlyTimeOnly>
     <DeferDatabasePopulation>true</DeferDatabasePopulation>
     <Database>Chinook</Database>
