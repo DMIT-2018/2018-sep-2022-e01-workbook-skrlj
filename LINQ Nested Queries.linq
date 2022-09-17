@@ -1,6 +1,6 @@
 <Query Kind="Program">
   <Connection>
-    <ID>a46606c5-cab2-4dc3-8c12-94ec1d3b2254</ID>
+    <ID>6cd0a226-8c31-42ad-a971-381fcc6d904b</ID>
     <NamingServiceVersion>2</NamingServiceVersion>
     <Persist>true</Persist>
     <Server>.\SQLEXPRESS</Server>
@@ -64,6 +64,26 @@ void Main()
 										}
 							);
 	results.Dump();
+	
+	// List all Albums that are from 1990
+	// Display the AlbumTitle and Artist Name
+	// For each Albumn display its Tracks
+	var nineties = Albums
+					.Where (a => a.ReleaseYear == 1990)
+					.Select (a => new 
+									{
+										Title = a.Title,
+										Artist = a.Artist.Name,
+										Tracks = a.Tracks
+													.Select(t => new 
+																	{
+																		Song = t.Name,
+																		Genre = t.Genre.Name
+																	}
+															)
+									}
+							);
+	nineties.Dump();
 }
 
 public class CustomerItem
