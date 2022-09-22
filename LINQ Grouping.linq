@@ -99,6 +99,7 @@ Albums
 Albums
 	.GroupBy(album => new{album.ReleaseLabel, album.ReleaseYear})
 	.Where(group => group.Count() > 2)
+	.ToList()
 	.Select(groupPile => new {
 									Label = groupPile.Key.ReleaseLabel,
 									Year = groupPile.Key.ReleaseYear,

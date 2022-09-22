@@ -1,6 +1,6 @@
 <Query Kind="Expression">
   <Connection>
-    <ID>6cd0a226-8c31-42ad-a971-381fcc6d904b</ID>
+    <ID>fa389fcc-ed69-4b31-8278-3ade764f17c3</ID>
     <NamingServiceVersion>2</NamingServiceVersion>
     <Persist>true</Persist>
     <Server>.\SQLEXPRESS</Server>
@@ -46,7 +46,7 @@ Tracks
 Tracks
 	.Select(x => x.Milliseconds).Average() // a single list of numbers
 
-Tracks.Average // aborts because no specific field was reffered to on the tack record
+Tracks.Average // aborts because no specific field was reffered to on the track record
 
 // List all Albums of the sixties showing the title, artist and various aggregates for albums containing tracks
 // For each Album, show the number of Tracks, the total price of all tracks, and the average playing length of the album tracks
