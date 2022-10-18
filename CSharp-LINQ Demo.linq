@@ -43,11 +43,43 @@ void Main()
 		// 756 Child in Time
 		
 		// On the webpage, the POST method would have already have access to the BindProperty variables containing the input values
-		playlistName = "hansenbtest";
-		int trackId = 793;
+		// playlistName = "hansenbtest";
+		// int trackId = 756;
 		
 		// the POST would call the service method to process the data
-		PlaylistTrack_AddTrack(playlistName, userName, trackId);
+		//PlaylistTrack_AddTrack(playlistName, userName, trackId); tested
+		
+		playlistName = "hansenbtest";
+		List<PlaylistTrackTRX> removeTrackInfo = new List<PlaylistTrackTRX>();
+		removeTrackInfo.Add(new PlaylistTrackTRX()
+								{
+									SelectedTrack = true,
+									TrackId = 793,
+									TrackNumber = 1,
+									TrackInput = 0
+								}
+							)
+							
+		removeTrackInfo.Add(new PlaylistTrackTRX()
+								{
+									SelectedTrack = true,
+									TrackId = 543,
+									TrackNumber = 1,
+									TrackInput = 0
+								}
+							)
+							
+		removeTrackInfo.Add(new PlaylistTrackTRX()
+								{
+									SelectedTrack = true,
+									TrackId = 822,
+									TrackNumber = 1,
+									TrackInput = 0
+								}
+							)
+							
+		// call the service method to process the data
+		PlaylistTrack_RemoveTracks(playlistName, userName, removeTrackInfo);
 		
 		// Once the service method is complete, the webpage would refresh to update the playlist
 		playlist = PlaylistTrack_FetchPlaylist(playlistName, userName);
@@ -92,6 +124,16 @@ public class PlaylistTrackInfo
 }
 #endregion
 
+#region Command Model for Remove and Move Track
+public class PlaylistTrackTRX
+{
+   public bool SelectedTrack {get; set;}
+   public int TrackId {get; set;}
+   public int TrackNumber {get; set;}
+   public int TrackInput {get; set;}
+}
+#endregion
+
 // General method to drill down into an exception to obtain the InnerException where your actual error is detailed
 private Exception GetInnerException(Exception ex)
 {
@@ -100,7 +142,7 @@ private Exception GetInnerException(Exception ex)
 	return ex;
 }
 
-// Orentedn to be the class library project
+// Pretend to be the class library project
 #region TrackServices class
 public List<TrackSelection> Track_FetchTracksBy(string searchArg, string searchBy)
 {
@@ -224,8 +266,7 @@ void PlaylistTrack_AddTrack(string playlistName, string userName, int trackId)
 			// Generate the next track number
 			trackNumber = PlaylistTracks
 								.Where(x => x.Playlist.Name.Equals(playlistName) &&
-												x.Playlist.UserName.Equals(userName) &&
-												x.TrackId == trackId
+												x.Playlist.UserName.Equals(userName)
 										)
 								.Count();
 			trackNumber++;
@@ -248,7 +289,66 @@ void PlaylistTrack_AddTrack(string playlistName, string userName, int trackId)
 	// Load the data to the new instance of playlistTrack
 	playlistTrackExists.TrackNumber = trackNumber;
 	playlistTrackExists.TrackId = trackId;
-	playlistTrackExists.PlaylistId = 
 	
+	// *** IMPORTANT ***
+	// Solving the issue of setting the playlistId when a new playlist needs to be generated (the instance of the playlist is only staged at this
+	// point). The actual SQL record has NOT yet been created. This means that the entity value for the new playlist DOES NOT exist yet. The value
+	// on the playlist instance is 0.
+	
+	// Solution is built into EntityFramework software and is based on using the navigational property in Playlists pointing to its "child"
+	// Staging a typical Add in the past was to reference the entity and use the entity.Add(xxxx)
+	//	 _context.PlaylistTrack.Add(xxxx)	[_context. is context instance in VS]
+	// If you use this statement, the playlistId would be zero, causing the transaction to ABORT
+	
+	// Instead, do the staging using the syntax of "parent.navigationalproperty.Add(xxxx)"
+	// playlistexists will be filled with either
+	//	 A) a new staged instance
+	// 	 B) a copy of the existing playlist instance
+	
+	playlistExists.PlaylistTracks.Add(playlistTrackExists);
+	
+	// Staging is now complete
+	// Commit the work (transaction)
+	// Commiting the work needs a .SaveChanges()
+	// A transaction has ONLY ONE .SaveChanges()
+	// If the .SaveChanges() fails, then all staged work being handled by the .SaveChanges() is ROLLBACK
+	SaveChanges();
+}
+
+public void PlaylistTrack_RemoveTracks(string playlistName, string userName, List<PlaylistTrackTRX> trackListInfo)
+{
+	// local variables
+	Playlists playlistExists = null;
+	
+	
+	if (string.IsNullOrWhiteSpace(playlistName))
+	{
+		throw new ArgumentNullException("No playlistName submitted");
+	}
+	
+	if (string.IsNullOrWhiteSpace(userName))
+	{
+		throw new ArgumentNullException("No userName submitted");
+	}
+	
+	var count = trackListInfo.Count();
+	if (count == 0)
+	{
+		throw new ArgumentNullException("No list of tracks were submitted");
+	}
+	
+	playlistExists = Playlists
+						.Where(x => x.Name.Equals(playlistName) && x.UserName.Equals(userName))
+						.Select(x => x)
+						.FirstOrDefault();
+	
+	if (playlistExists == null)
+	{
+		throw new ArgumentException($"Playlist {playlistName} does not exist for this user");
+	}
+	
+	else
+	{
+	}
 }
 #endregion
