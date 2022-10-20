@@ -106,6 +106,15 @@ void Main()
 		GetInnerException(ex).Message.Dump();
 	}
 	
+	catch (AggregateException ex)
+	{
+	 	// Having collected a number of errors, each error should be dumped to a seperate line
+		foreach(var error in ex.InnerExceptions)
+		{
+			error.Message.Dump();
+		}
+	}
+	
 	catch (Exception ex)
 	{
 		GetInnerException(ex).Message.Dump();
@@ -331,6 +340,9 @@ public void PlaylistTrack_RemoveTracks(string playlistName, string userName, Lis
 	PlaylistTracks playlistTrackExists = null;
 	int trackNumber = 1;
 	
+	// a container is needed to hold x number of Exception messages
+	List<Exception> errorList = new List<Exception>();
+	
 	if (string.IsNullOrWhiteSpace(playlistName))
 	{
 		throw new ArgumentNullException("No playlistName submitted");
@@ -354,7 +366,7 @@ public void PlaylistTrack_RemoveTracks(string playlistName, string userName, Lis
 	
 	if (playlistExists == null)
 	{
-		throw new ArgumentException($"Playlist {playlistName} does not exist for this user");
+		errorList.Add(new ArgumentException($"Playlist {playlistName} does not exist for this user"));
 	}
 	
 	else
@@ -409,12 +421,19 @@ public void PlaylistTrack_RemoveTracks(string playlistName, string userName, Lis
 								.Select(s => s.Name)
 								.SingleOrDefault();
 								
-				throw new Exception($"The track ({songName}) is no longer on file. Please Remove.");			
+				errorList.Add(new Exception($"The track ({songName}) is no longer on file. Please Remove."));			
 			}
 		}
 		
-		// All work has been staged
-		SaveChanges();
+		if(errorList.Count > 0)
+		{
+			throw new AggregateException("Unable to remove selected tracks. Check concerns.", errorList);
+		}
+		else
+		{
+			// All work has been staged
+			SaveChanges();
+		}
 	}
 }
 #endregion
