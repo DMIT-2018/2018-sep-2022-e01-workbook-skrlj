@@ -17,111 +17,193 @@
 void Main()
 {
 	// Main is going to represent the web page POST method
+
 	try
 	{
-		// Coded and tested the FetchTracksBy query
-		string searchArg = "Deep";
-		string searchBy = "Artist";
-		List<TrackSelection> trackList = Track_FetchTracksBy(searchArg, searchBy);
-		//trackList.Dump();
+		//Driver
+		//Test_TrackListQuery();
 		
-		// Coded and tested the FetchPlaylist query
-		string playlistName = "hansenb1";
-		string userName = "HansenB"; // this is an user name which will come from O/S via security
-		List<PlaylistTrackInfo> playlist = PlaylistTrack_FetchPlaylist(playlistName, userName);
-		//playlist.Dump();
+		//Test_PlaylistQuery();
 		
-		// Coded and tested the Add_Track TRX (transaction)
-		// The command method will recieve no collection but will recieve individual arguments
-		// Arguments: trackId, playlistName, userName
-		// Test tracks
-		// 793 A castle full of Rascals
-		// 822 A Twist in the Tail
-		// 543 Burn
-		// 756 Child in Time
+		//Test_AddTrackTRX();
 		
-		//On the webpage, the POST method would have already have access to the BindProperty variables containing the input values
-		//playlistName = "hansenbtest";
-		//int trackId = 756;
+		//Test_RemoveTrackTRX();
 		
-		// the POST would call the service method to process the data
-		//PlaylistTrack_AddTrack(playlistName, userName, trackId);
-		
-		playlistName = "hansenbtest";
-		List<PlaylistTrackTRX> removeTrackInfo = new List<PlaylistTrackTRX>();
-		removeTrackInfo.Add(new PlaylistTrackTRX()
-								{
-									SelectedTrack = true,
-									TrackId = 793,
-									TrackNumber = 1,
-									TrackInput = 4
-								}
-							);
-		
-		removeTrackInfo.Add(new PlaylistTrackTRX()
-								{
-									SelectedTrack = true,
-									TrackId = 822,
-									TrackNumber = 2,
-									TrackInput = 3
-								}
-							);
-							
-		removeTrackInfo.Add(new PlaylistTrackTRX()
-								{
-									SelectedTrack = false,
-									TrackId = 543,
-									TrackNumber = 3,
-									TrackInput = 2
-								}
-							);
-							
-		removeTrackInfo.Add(new PlaylistTrackTRX()
-								{
-									SelectedTrack = false,
-									TrackId = 756,
-									TrackNumber = 4,
-									TrackInput = 1
-								}
-							);
-											
-		// call the service method to process the data
-		// PlaylistTrack_RemoveTracks(playlistName, userName, removeTrackInfo);
-		
-		// call the service method to process the data
-		 PlaylistTrack_MoveTracks(playlistName, userName, removeTrackInfo);
-		
-		// Once the service method is complete, the webpage would refresh to update the playlist
-		playlist = PlaylistTrack_FetchPlaylist(playlistName, userName);
-		playlist.Dump();
-		
+		//Test_MoveTrackTRX();
+				
 	}
-	
 	catch (ArgumentNullException ex)
 	{
 		GetInnerException(ex).Message.Dump();
 	}
-	
 	catch (ArgumentException ex)
 	{
+		
 		GetInnerException(ex).Message.Dump();
 	}
-	
-	catch (AggregateException ex)
+	catch(AggregateException ex)
 	{
-	 	// Having collected a number of errors, each error should be dumped to a seperate line
+		//having collected a number of errors
+		//	each error should be dumped to a separate line
 		foreach(var error in ex.InnerExceptions)
 		{
 			error.Message.Dump();
 		}
 	}
-	
 	catch (Exception ex)
 	{
 		GetInnerException(ex).Message.Dump();
 	}
 
 }
+
+// You can define other methods, fields, classes and namespaces here
+
+//pretend to be the web application OnPost methods project
+#region Driver Methods
+//Driver Methods
+//general method to drill down into an exception of obtain the InnerException where your
+//  actual error is detailed
+
+private Exception GetInnerException(Exception ex)
+{
+	while (ex.InnerException != null)
+		ex = ex.InnerException;
+	return ex;
+}
+
+
+void Test_TrackListQuery()
+{
+	//coded and tested the FetchTracksBy query
+	string searcharg ="Deep";
+	string searchby = "Artist";
+	List<TrackSelection> tracklist = Track_FetchTracksBy(searcharg, searchby);
+	tracklist.Dump();
+	
+}
+
+void Test_PlaylistQuery()
+{
+	//coded and tested the FetchPlaylist query
+	string playlistname ="hansenb1";
+	string username = "HansenB"; //this is an user name which will come from O/S via security
+	List<PlaylistTrackInfo> playlist = PlaylistTrack_FetchPlaylist(playlistname, username);
+	playlist.Dump();
+}
+
+void Test_AddTrackTRX()
+{
+	//coded and tested the Add_Track trx
+	//the command method will receive no collection but will receive individual arguments
+	// trackid, playlistname, username
+	//test tracks
+	//543 Burn
+	//756 Child in Time
+	//822 A Twist in the Tail
+	//793 A castle full of Rascals
+
+	//on the web page, the post method would have already have access to the
+	//  BindProperty variables containing the input values
+	string playlistname = "hansenbtest";
+	string username = "HansenB";
+	int trackid = 793;
+
+	//call the service method to process the data
+	PlaylistTrack_AddTrack(playlistname, username, trackid); 
+
+	//once the service method is complete, the web page would refresh
+	var playlist = PlaylistTrack_FetchPlaylist(playlistname, username);
+	playlist.Dump();
+}
+
+void Test_RemoveTrackTRX()
+{
+	//on the web page, the post method would have already have access to the
+	//	BindProperty variables containing the input values
+	string playlistname = "hansenbtest";
+	string username = "HansenB";
+	List<PlaylistTrackTRX> tracklistinfo = new List<PlaylistTrackTRX>();
+	tracklistinfo.Add(new PlaylistTrackTRX()
+	{
+		SelectedTrack = false,
+		TrackId = 543,
+		TrackNumber = 1,
+		TrackInput = 0
+	});
+	tracklistinfo.Add(new PlaylistTrackTRX()
+	{
+		SelectedTrack = true,
+		TrackId = 756,
+		TrackNumber = 2,
+		TrackInput = 0
+	});
+	tracklistinfo.Add(new PlaylistTrackTRX()
+	{
+		SelectedTrack = true,
+		TrackId = 822,
+		TrackNumber = 3,
+		TrackInput = 0
+	});
+	tracklistinfo.Add(new PlaylistTrackTRX()
+	{
+		SelectedTrack = false,
+		TrackId = 793,
+		TrackNumber = 4,
+		TrackInput = 0
+	});
+
+	//call the service method to process the data
+	PlaylistTrack_RemoveTracks(playlistname, username, tracklistinfo);
+	//once the service method is complete, the web page would refresh
+	var playlist = PlaylistTrack_FetchPlaylist(playlistname, username);
+	playlist.Dump();
+}
+
+void Test_MoveTrackTRX()
+{
+	//on the web page, the post method would have already have access to the
+	//	BindProperty variables containing the input values
+	string playlistname = "hansenbtest";
+	string username = "HansenB";
+	List<PlaylistTrackTRX> tracklistinfo = new List<PlaylistTrackTRX>();
+	tracklistinfo.Add(new PlaylistTrackTRX()
+	{
+		SelectedTrack = false,
+		TrackId = 543,
+		TrackNumber = 1,
+		TrackInput = 6
+	});
+	tracklistinfo.Add(new PlaylistTrackTRX()
+	{
+		SelectedTrack = false,
+		TrackId = 756,
+		TrackNumber = 2,
+		TrackInput = 99
+	});
+	tracklistinfo.Add(new PlaylistTrackTRX()
+	{
+		SelectedTrack = false,
+		TrackId = 822,
+		TrackNumber = 3,
+		TrackInput = 8
+	});
+	tracklistinfo.Add(new PlaylistTrackTRX()
+	{
+		SelectedTrack = false,
+		TrackId = 793,
+		TrackNumber = 4,
+		TrackInput = 2
+	});
+
+	//call the service method to process the data
+	PlaylistTrack_MoveTracks(playlistname, username, tracklistinfo);
+	//once the service method is complete, the web page would refresh
+	var playlist = PlaylistTrack_FetchPlaylist(playlistname, username);
+	playlist.Dump();
+}
+
+#endregion
 
 #region CQRS Queries
 public class TrackSelection
@@ -153,13 +235,6 @@ public class PlaylistTrackTRX
 }
 #endregion
 
-// General method to drill down into an exception to obtain the InnerException where your actual error is detailed
-private Exception GetInnerException(Exception ex)
-{
-	while (ex.InnerException != null)
-		ex = ex.InnerException;
-	return ex;
-}
 
 // Pretend to be the class library project
 #region TrackServices class
