@@ -22,13 +22,10 @@ namespace ChinookSystem.DAL
         public virtual DbSet<Customer> Customers { get; set; } = null!;
         public virtual DbSet<Employee> Employees { get; set; } = null!;
         public virtual DbSet<Genre> Genres { get; set; } = null!;
-        public virtual DbSet<Invoice> Invoices { get; set; } = null!;
-        public virtual DbSet<InvoiceLine> InvoiceLines { get; set; } = null!;
         public virtual DbSet<MediaType> MediaTypes { get; set; } = null!;
         public virtual DbSet<Playlist> Playlists { get; set; } = null!;
         public virtual DbSet<PlaylistTrack> PlaylistTracks { get; set; } = null!;
         public virtual DbSet<Track> Tracks { get; set; } = null!;
-        public virtual DbSet<WorkingVersion> WorkingVersions { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -135,52 +132,6 @@ namespace ChinookSystem.DAL
                 entity.Property(e => e.Name).HasMaxLength(120);
             });
 
-            modelBuilder.Entity<Invoice>(entity =>
-            {
-                entity.HasIndex(e => e.CustomerId, "IFK_InvoicesCustomerId");
-
-                entity.Property(e => e.BillingAddress).HasMaxLength(70);
-
-                entity.Property(e => e.BillingCity).HasMaxLength(40);
-
-                entity.Property(e => e.BillingCountry).HasMaxLength(40);
-
-                entity.Property(e => e.BillingPostalCode).HasMaxLength(10);
-
-                entity.Property(e => e.BillingState).HasMaxLength(40);
-
-                entity.Property(e => e.InvoiceDate).HasColumnType("datetime");
-
-                entity.Property(e => e.Total).HasColumnType("numeric(10, 2)");
-
-                entity.HasOne(d => d.Customer)
-                    .WithMany(p => p.Invoices)
-                    .HasForeignKey(d => d.CustomerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_InvoicesCustomers_CustomerId");
-            });
-
-            modelBuilder.Entity<InvoiceLine>(entity =>
-            {
-                entity.HasIndex(e => e.InvoiceId, "IFK_InvoiceLinesInvoiceId");
-
-                entity.HasIndex(e => e.TrackId, "IFK_InvoiceLinesTrackId");
-
-                entity.Property(e => e.UnitPrice).HasColumnType("numeric(10, 2)");
-
-                entity.HasOne(d => d.Invoice)
-                    .WithMany(p => p.InvoiceLines)
-                    .HasForeignKey(d => d.InvoiceId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_InvoiceLinesInvoices_InvoiceId");
-
-                entity.HasOne(d => d.Track)
-                    .WithMany(p => p.InvoiceLines)
-                    .HasForeignKey(d => d.TrackId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_InvoiceLinesTracks_TrackId");
-            });
-
             modelBuilder.Entity<MediaType>(entity =>
             {
                 entity.Property(e => e.Name).HasMaxLength(120);
@@ -241,18 +192,6 @@ namespace ChinookSystem.DAL
                     .HasForeignKey(d => d.MediaTypeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_TracksMediaTypes_MediaTypeId");
-            });
-
-            modelBuilder.Entity<WorkingVersion>(entity =>
-            {
-                entity.HasKey(e => e.VersionId)
-                    .HasName("PK__WorkingV__16C6400F80327A65");
-
-                entity.Property(e => e.AsOfDate).HasColumnType("datetime");
-
-                entity.Property(e => e.Comments)
-                    .HasMaxLength(50)
-                    .IsFixedLength();
             });
 
             OnModelCreatingPartial(modelBuilder);

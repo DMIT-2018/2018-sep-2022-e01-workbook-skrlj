@@ -7,7 +7,6 @@ namespace ChinookSystem.Entities
     {
         public Customer()
         {
-            Invoices = new HashSet<Invoice>();
         }
 
         public int CustomerId { get; set; }
@@ -25,6 +24,5 @@ namespace ChinookSystem.Entities
         public int? SupportRepId { get; set; }
 
         public virtual Employee? SupportRep { get; set; }
-        public virtual ICollection<Invoice> Invoices { get; set; }
     }
 }

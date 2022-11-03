@@ -7,7 +7,6 @@ namespace ChinookSystem.Entities
     {
         public Track()
         {
-            InvoiceLines = new HashSet<InvoiceLine>();
             PlaylistTracks = new HashSet<PlaylistTrack>();
         }
 
@@ -24,7 +23,6 @@ namespace ChinookSystem.Entities
         public virtual Album? Album { get; set; }
         public virtual Genre? Genre { get; set; }
         public virtual MediaType MediaType { get; set; } = null!;
-        public virtual ICollection<InvoiceLine> InvoiceLines { get; set; }
         public virtual ICollection<PlaylistTrack> PlaylistTracks { get; set; }
     }
 }
