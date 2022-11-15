@@ -57,7 +57,7 @@ namespace ChinookSystem.BLL
         #endregion
 
         #region Services
-        void PlaylistTrack_AddTrack(string playlistName, string userName, int trackId)
+        public void PlaylistTrack_AddTrack(string playlistName, string userName, int trackId)
         {
             // locals
             Track trackExists = null;

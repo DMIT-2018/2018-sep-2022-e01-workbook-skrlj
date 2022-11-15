@@ -39,7 +39,7 @@ namespace ChinookSystem.BLL
             // Needed to add _context before the Tracks as context is an object of the database
             IEnumerable<TrackSelection> results = _context.Tracks
                                                     .Where(x => (x.Album.Artist.Name.Contains(searchArg) && searchBy.Equals("Artist")) ||
-                                                                (x.Album.Artist.Name.Contains(searchArg) && searchBy.Equals("Album")))
+                                                                (x.Album.Title.Contains(searchArg) && searchBy.Equals("Album")))
                                                     .Select(x => new TrackSelection
                                                     {
                                                         TrackId = x.TrackId,

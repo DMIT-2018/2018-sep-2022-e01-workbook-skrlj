@@ -19,10 +19,10 @@ namespace WebApp.Pages.SamplePages
 
 
         public PlaylistManagementModel(TrackServices trackservices,
-                                PlaylistTrackServices _playlisttrackservices)
+                                PlaylistTrackServices playlisttrackservices)
         {
             _trackServices = trackservices;
-            _playlisttrackServices = _playlisttrackservices;
+            _playlisttrackServices = playlisttrackservices;
         }
         #endregion
 
@@ -36,7 +36,7 @@ namespace WebApp.Pages.SamplePages
         public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
         public bool HasFeedBack => !string.IsNullOrWhiteSpace(FeedBackMessage);
 
-        //used to display any collection of errors on web page
+        //used to display any collection of errors on web page whether the errors are generated locally OR come from the class library service Methods
         public List<string> ErrorDetails { get; set; } = new();
 
         //PageModel local error list for collection 
@@ -64,15 +64,21 @@ namespace WebApp.Pages.SamplePages
 
         public List<PlaylistTrackInfo> qplaylistInfo { get; set; }
 
+        // This property will be tied to the input fields of the webpage
+        // This list is tied to the table data elements for the playlist
         [BindProperty]
         public List<PlaylistTrackTRX> cplaylistInfo { get; set; }
 
+        // This property is tied to the form input element located on each of the rows of the track table
+        // It will hold the trackID that the user wishes to add to the playlist
         [BindProperty]
         public int addtrackid { get; set; }
 
         public const string USERNAME = "HansenB";
         public void OnGet()
         {
+            // This method is executed everytime the page is called for the first time OR whenever a GET request is made to the page
+            // eg. RedirectToPage()
             GetTrackInfo();
             GetPlaylist();
         }
@@ -85,6 +91,7 @@ namespace WebApp.Pages.SamplePages
                 int totalcount = 0;
                 int pagenumber = currentpage.HasValue ? currentpage.Value : 1;
                 PageState current = new(pagenumber, PAGE_SIZE);
+                // When we inject a dependency (_trackServices) we can use all the methods in that class
                 trackInfo = _trackServices.Track_FetchTracksBy(searchArg.Trim(),
                     searchBy.Trim(), pagenumber, PAGE_SIZE, out totalcount);
                 Pager = new(totalcount, current);
@@ -99,6 +106,8 @@ namespace WebApp.Pages.SamplePages
                 qplaylistInfo = _playlisttrackServices.PlaylistTrack_FetchPlaylist(playlistname.Trim(), username);
             }
         }
+
+        // When returning an IActionResult, there MUST be a RedirectToPage() or a Get_xxx
         public IActionResult OnPostTrackSearch()
         {
             try
@@ -115,6 +124,7 @@ namespace WebApp.Pages.SamplePages
                 {
                     throw new AggregateException(Errors);
                 }
+                // RedirectToPage will cause an Get request to be issued (OnGet())
                 return RedirectToPage(new
                 {
                     searchBy = searchBy.Trim(),
@@ -130,6 +140,7 @@ namespace WebApp.Pages.SamplePages
                     ErrorDetails.Add(error.Message);
                     
                 }
+                // This will display a refreshed page with the errors still in place
                 return Page();
             }
             catch (Exception ex)
@@ -170,8 +181,15 @@ namespace WebApp.Pages.SamplePages
                 {
                     throw new Exception("You need to have a playlist select first. Enter a playlist name and Fetch");
                 }
-               
+
                 // Add the code to add a track via the service.
+                // The data needed for the AddTrack call has already been placed in the local properties by using [BindProperty] which is two way (output/input)
+                // Once security is installed, you would be able to obtain the username from the operating system
+
+                string userName = USERNAME;
+
+                // Call the service sending in the expected data
+                _playlisttrackServices.PlaylistTrack_AddTrack(playlistname, userName, addtrackid);
                 
                 FeedBackMessage = "adding the track";
                 return RedirectToPage(new
@@ -190,6 +208,8 @@ namespace WebApp.Pages.SamplePages
                     ErrorDetails.Add(error.Message);
 
                 }
+                // Since the OnGet() will NOT be called if there is a transaction error, the catch MUST do the actions of the OnGet
+                // If we did a Redirect here, the errors that we want to display would be lost and would not be able to be displayed
                 GetTrackInfo();
                 GetPlaylist();
 
