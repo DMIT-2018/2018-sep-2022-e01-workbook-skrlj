@@ -192,11 +192,32 @@
                            *@
                            @foreach(var item in Model.qplaylistInfo)
                            {
+                               @*
+                                   Retain entered values of non-query model fields (from the command collection) to assist with error messages
+                                   Set up local variables to hold the command data values
+                                   Move any existing command collection data into the appropriate values
+                                   **WARNING**
+                                        You MUST have an instance of your command collection (List<>)
+                                        To solve this, add a = new() to the declaration of your command collection
+                                        This will ensure that a command data collection instance exists even if empty
+                               *@
+
+                                bool selectedTrack = false;
+                                string? trackInput = null;
+
+                                var song = Model.cplaylistInfo.SingleOrDefault(x => x.TrackId == item.TrackId);
+
+                                if(song != null)
+                                {
+                                    selectedTrack = song.SelectedTrack;
+                                    trackInput = song.TrackInput.ToString();
+                                }
+
                                <tr>
                                    <td>
                                         <input type="hidden" name="cplaylistinfo.Index" value="@item.TrackId">
                                         <input type="hidden" name="cplaylistinfo[@item.TrackId].TrackId" value="@item.TrackId">
-                                        <input type="checkbox" name="cplaylistinfo[@item.TrackId].SelectedTrack" value="true">
+                                        <input type="checkbox" checked="@selectedTrack" name="cplaylistinfo[@item.TrackId].SelectedTrack" value="true">
                                    </td>
                                    <td>
                                         <input type="hidden" name="cplaylistinfo[@item.TrackId].TrackNumber" value="@item.TrackNumber">
@@ -209,7 +230,7 @@
                                         @TimeSpan.FromMilliseconds(item.Milliseconds).ToString(@"mm\:ss")
                                     </td>
                                     <td>
-                                        <input type="text" name="cplaylistinfo[@item.TrackId].TrackInput">
+                                        <input type="text" class="smallbox" name="cplaylistinfo[@item.TrackId].TrackInput" value="@trackInput">
                                     </td>
                                </tr>
                            }

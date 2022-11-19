@@ -62,12 +62,13 @@ namespace WebApp.Pages.SamplePages
 
         public List<TrackSelection> trackInfo { get; set; }
 
-        public List<PlaylistTrackInfo> qplaylistInfo { get; set; }
+        // the new() is REQUIRED to assist in retaining values during error handling
+        public List<PlaylistTrackInfo> qplaylistInfo { get; set; } 
 
         // This property will be tied to the input fields of the webpage
         // This list is tied to the table data elements for the playlist
         [BindProperty]
-        public List<PlaylistTrackTRX> cplaylistInfo { get; set; }
+        public List<PlaylistTrackTRX> cplaylistInfo { get; set; } = new();
 
         // This property is tied to the form input element located on each of the rows of the track table
         // It will hold the trackID that the user wishes to add to the playlist
@@ -231,6 +232,27 @@ namespace WebApp.Pages.SamplePages
             try
             {
                //Add the code to process the list of tracks via the service.
+                if (string.IsNullOrWhiteSpace(playlistname))
+                {
+                    throw new Exception("You need to have a playlist selected first. Enter a playlist name and press Fetch");
+                }
+
+                int oneSelection = cplaylistInfo
+                                     .Where(x => x.SelectedTrack)
+                                     .Count();
+
+                if (oneSelection == 0)
+                {
+                    throw new Exception("You first need to select at least one track to delete before pressing Remove.");
+                }
+
+                string userName = USERNAME;
+
+                // send data to the service
+                _playlisttrackServices.PlaylistTrack_RemoveTracks(playlistname, userName, cplaylistInfo);
+
+                // success
+                FeedBackMessage = "Tracks have been removed.";
 
                 return RedirectToPage(new
                 {
@@ -243,6 +265,56 @@ namespace WebApp.Pages.SamplePages
             {
 
                 ErrorMessage = "Unable to process remove tracks";
+                foreach (var error in ex.InnerExceptions)
+                {
+                    ErrorDetails.Add(error.Message);
+
+                }
+                GetTrackInfo();
+                GetPlaylist();
+
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = GetInnerException(ex).Message;
+                GetTrackInfo();
+                GetPlaylist();
+
+                return Page();
+            }
+
+        }
+
+        public IActionResult OnPostReOrg()
+        {
+            try
+            {
+                //Add the code to process the list of tracks via the service.
+                if (string.IsNullOrWhiteSpace(playlistname))
+                {
+                    throw new Exception("You need to have a playlist selected first. Enter a playlist name and press Fetch");
+                }
+
+                string userName = USERNAME;
+
+                // send data to the service
+                _playlisttrackServices.PlaylistTrack_MoveTracks(playlistname, userName, cplaylistInfo);
+
+                // success
+                FeedBackMessage = "Tracks have been reorganized";
+
+                return RedirectToPage(new
+                {
+                    searchBy = string.IsNullOrWhiteSpace(searchBy) ? " " : searchBy.Trim(),
+                    searchArg = string.IsNullOrWhiteSpace(searchArg) ? " " : searchArg.Trim(),
+                    playlistname = playlistname
+                });
+            }
+            catch (AggregateException ex)
+            {
+
+                ErrorMessage = "Unable to reorganize tracks";
                 foreach (var error in ex.InnerExceptions)
                 {
                     ErrorDetails.Add(error.Message);
