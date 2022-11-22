@@ -90,6 +90,14 @@ namespace ChinookSystem
                 var context = serviceProvider.GetRequiredService<ChinookContext>();
                 return new AlbumServices(context);
             });
+
+
+            services.AddTransient<AboutServices>((serviceProvider) =>
+            {
+                // Retrieve the registered DbContext done with AddDbContext
+                var context = serviceProvider.GetRequiredService<ChinookContext>();
+                return new AboutServices(context);
+            });
         }
     }
 }
